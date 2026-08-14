@@ -1,3 +1,4 @@
+import { router as healthRouter, registerCheck } from "./router/health.js";
 import express from "express";
 import morgan from "morgan";
 import cors from "cors";
@@ -13,6 +14,11 @@ app.use(cors());
 app.use(morgan("dev"));
 
 app.use("/", fileRouter);
+
+registerCheck("postgres", () => pool.query("SELECT 1"));
+registerCheck("redis", () => redisClient.ping());
+
+app.use(healthRouter);
 
 app.get("/", (req, res) => {
   res.status(200).json({
