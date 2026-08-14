@@ -1,7 +1,7 @@
-import { router as healthRouter, registerCheck } from "./router/health.js";
 import express from "express";
 import morgan from "morgan";
 import cors from "cors";
+import mongoose from "mongoose";
 import "dotenv/config";
 
 import connectDB from "./config/db.js";
@@ -15,14 +15,17 @@ app.use(morgan("dev"));
 
 app.use("/", fileRouter);
 
-registerCheck("postgres", () => pool.query("SELECT 1"));
-registerCheck("redis", () => redisClient.ping());
-
-app.use(healthRouter);
-
 app.get("/", (req, res) => {
   res.status(200).json({
     message: "Hello From Server",
+  });
+});
+
+app.get("/health", (req, res) => {
+  res.status(200).json({
+    status: "ok",
+    uptimeSeconds: Math.floor(process.uptime()),
+    timestamp: new Date().toISOString(),
   });
 });
 
